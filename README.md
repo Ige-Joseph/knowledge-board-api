@@ -6,7 +6,7 @@ A clean, scalable REST API powering a collaborative workspace application — bu
 
 ## Repository
 
-[https://github.com/your-username/knowledge-board-api](https://github.com/your-username/knowledge-board-api)
+[https://github.com/Ige-Joseph/knowledge-board-api](https://github.com/Ige-Joseph/knowledge-board-api)
 
 ---
 
@@ -235,7 +235,7 @@ Comments belong to both a Card and a User. The card relationship determines wher
 ### Installation
 
 ```bash
-git clone https://github.com/your-username/knowledge-board-api
+git clone https://github.com/Ige-Joseph/knowledge-board-api
 cd knowledge-board-api
 npm install
 ```
