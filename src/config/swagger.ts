@@ -10,6 +10,10 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
+        url: "https://knowledge-board-api.fly.dev",
+        description: "Production server",
+      },
+      {
         url: "http://localhost:3000",
         description: "Development server",
       },
