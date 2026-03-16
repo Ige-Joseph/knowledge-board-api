@@ -57,6 +57,8 @@ model Card {
   title       String
   description String?
   dueDate     DateTime?
+  position    Int       @default(0)        
+  version     Int       @default(0)         
   columnId    String
   column      Column    @relation(fields: [columnId], references: [id], onDelete: Cascade)
   tags        CardTag[]
@@ -65,6 +67,7 @@ model Card {
   comments  Comment[]
 
   @@index([columnId])
+  @@index([columnId, position])   
 }
 
 model Tag {
@@ -88,10 +91,14 @@ model Comment {
   content   String
   cardId    String
   userId    String
+  parentId  String? 
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
   card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([cardId])
+  @@index([parentId])    
 }
