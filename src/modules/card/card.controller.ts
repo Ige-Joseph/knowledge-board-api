@@ -48,6 +48,35 @@ const cardController = {
       next(err)
     }
   },
+
+
+  async reorderCard(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const card = await cardService.reorderCard(
+        req.user!.id,
+        req.params.id as string,
+        req.body.position
+      )
+      sendSuccess(res, card)
+    } catch (err) {
+      next(err)
+    }
+  },
+
+  async moveCard(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const card = await cardService.moveCardToColumn(
+        req.user!.id,
+        req.params.id as string,
+        req.body.targetColumnId,
+        req.body.position
+      )
+      sendSuccess(res, card)
+    } catch (err) {
+      next(err)
+    }
+  },
+  
 }
 
 export default cardController

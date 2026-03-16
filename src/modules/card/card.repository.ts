@@ -23,7 +23,7 @@ const cardRepository = {
     return prisma.card.findMany({
       where: { columnId },
       include: { tags: { include: { tag: true } } },
-      orderBy: { createdAt: "asc" },
+      orderBy: { position: "asc" },
     })
   },
 
@@ -50,6 +50,48 @@ const cardRepository = {
       where: { id: cardId },
       include: { tags: { include: { tag: true } } },
     })
+  },
+
+  async updatePosition(id: string, position: number) {
+    return prisma.card.update({
+      where: { id },
+      data: { position },
+    })
+  },
+
+  async shiftPositionsDown(columnId: string, fromPosition: number, toPosition: number) {
+    return prisma.card.updateMany({
+      where: {
+        columnId,
+        position: { gte: fromPosition, lte: toPosition },
+      },
+      data: { position: { increment: 1 } },
+    })
+  },
+
+  async shiftPositionsUp(columnId: string, fromPosition: number, toPosition: number) {
+    return prisma.card.updateMany({
+      where: {
+        columnId,
+        position: { gte: fromPosition, lte: toPosition },
+      },
+      data: { position: { decrement: 1 } },
+    })
+  },
+
+  async moveToColumn(id: string, columnId: string, position: number) {
+    return prisma.card.update({
+      where: { id },
+      data: { columnId, position },
+    })
+  },
+
+  async getMaxPosition(columnId: string) {
+    const result = await prisma.card.aggregate({
+      where: { columnId },
+      _max: { position: true },
+    })
+    return result._max.position ?? -1
   },
 }
 
