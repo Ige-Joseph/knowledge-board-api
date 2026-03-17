@@ -47,6 +47,26 @@ const commentService = {
 
     return commentRepository.delete(commentId)
   },
+
+
+  async createReply(userId: string, cardId: string, parentId: string, content: string) {
+    const card = await cardRepository.findById(cardId)
+    if (!card) throw new AppError("Card not found", 404)
+
+    const column = await columnRepository.findById(card.columnId)
+    const board = await boardRepository.findById(column!.boardId)
+    if (board?.userId !== userId) throw new AppError("Forbidden", 403)
+
+    const parentComment = await commentRepository.findById(parentId)
+    if (!parentComment) throw new AppError("Parent comment not found", 404)
+
+    // only allow 2 levels — replies cannot be replied to
+    if (parentComment.parentId !== null) {
+      throw new AppError("Cannot reply to a reply — maximum 2 levels allowed", 400)
+    }
+
+    return commentRepository.createReply(cardId, userId, parentId, content)
+  },
 }
 
 export default commentService

@@ -502,6 +502,30 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
+      "/api/cards/{cardId}/comments/{commentId}/replies": {
+        post: {
+          tags: ["Comments"],
+          summary: "Reply to a comment",
+          parameters: [
+            { name: "cardId", in: "path", required: true, schema: { type: "string" } },
+            { name: "commentId", in: "path", required: true, schema: { type: "string" } },
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/CommentInput" },
+              },
+            },
+          },
+          responses: {
+            201: { description: "Reply created" },
+            400: { description: "Cannot reply to a reply" },
+            403: { description: "Forbidden" },
+            404: { description: "Comment not found" },
+          },
+        },
+      },
     },
   },
   apis: [],

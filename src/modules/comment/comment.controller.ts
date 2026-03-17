@@ -41,6 +41,7 @@ const commentController = {
       next(err)
     }
   },
+  
 
   async deleteComment(req: AuthRequest, res: Response, next: NextFunction) {
     try {
@@ -50,6 +51,23 @@ const commentController = {
       next(err)
     }
   },
+
+
+
+  async createReply(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const reply = await commentService.createReply(
+        req.user!.id,
+        req.params.cardId as string,
+        req.params.commentId as string,
+        req.body.content
+      )
+      sendSuccess(res, reply, 201)
+    } catch (err) {
+      next(err)
+    }
+  },
+  
 }
 
 export default commentController

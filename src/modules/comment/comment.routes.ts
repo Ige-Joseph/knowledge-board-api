@@ -12,5 +12,6 @@ router.post("/", validate(createCommentSchema), commentController.createComment)
 router.get("/", commentController.getCommentsByCard)
 router.put("/:id", validate(updateCommentSchema), commentController.updateComment)
 router.delete("/:id", commentController.deleteComment)
+router.post("/:commentId/replies", validate(createCommentSchema), commentController.createReply)
 
 export default router

@@ -11,14 +11,37 @@ const commentRepository = {
 
   async findByCard(cardId: string) {
     return prisma.comment.findMany({
-      where: { cardId },
-      include: { user: { select: { id: true, name: true, email: true } } },
+      where: { cardId, parentId: null },
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+        replies: {
+          include: {
+            user: { select: { id: true, name: true, email: true } },
+            replies: {
+              include: {
+                user: { select: { id: true, name: true, email: true } },
+              },
+            },
+          },
+        },
+      },
       orderBy: { createdAt: "asc" },
     })
   },
 
+
   async findById(id: string) {
     return prisma.comment.findUnique({ where: { id } })
+  },
+  
+
+  async createReply(cardId: string, userId: string, parentId: string, content: string) {
+    return prisma.comment.create({
+      data: { content, cardId, userId, parentId },
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+      },
+    })
   },
 
   async update(id: string, data: UpdateCommentInput) {
