@@ -13,7 +13,8 @@ const cardService = {
     const board = await boardRepository.findById(column.boardId)
     if (board?.userId !== userId) throw new AppError("Forbidden", 403)
 
-    return cardRepository.create(columnId, data)
+    const maxPosition = await cardRepository.getMaxPosition(columnId)
+    return cardRepository.create(columnId, data, maxPosition + 1)
   },
 
   async getCardsByColumn(userId: string, columnId: string) {

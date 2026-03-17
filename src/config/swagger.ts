@@ -93,6 +93,21 @@ const options: swaggerJsdoc.Options = {
             content: { type: "string", example: "This needs to be fixed asap" },
           },
         },
+        ReorderCardInput: {
+          type: "object",
+          required: ["position"],
+          properties: {
+            position: { type: "integer", minimum: 0, example: 1 },
+          },
+        },
+        MoveCardInput: {
+          type: "object",
+          required: ["targetColumnId"],
+          properties: {
+            targetColumnId: { type: "string", example: "column-uuid-here" },
+            position: { type: "integer", minimum: 0, example: 0 },
+          },
+        },
       },
     },
     security: [{ bearerAuth: [] }],
@@ -341,6 +356,52 @@ const options: swaggerJsdoc.Options = {
           },
           responses: {
             200: { description: "Tags assigned to card" },
+            403: { description: "Forbidden" },
+            404: { description: "Card not found" },
+          },
+        },
+      },
+      "/api/columns/{columnId}/cards/{id}/reorder": {
+        patch: {
+          tags: ["Cards"],
+          summary: "Reorder a card within a column",
+          parameters: [
+            { name: "columnId", in: "path", required: true, schema: { type: "string" } },
+            { name: "id", in: "path", required: true, schema: { type: "string" } },
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ReorderCardInput" },
+              },
+            },
+          },
+          responses: {
+            200: { description: "Card reordered" },
+            403: { description: "Forbidden" },
+            404: { description: "Card not found" },
+          },
+        },
+      },
+      "/api/columns/{columnId}/cards/{id}/move": {
+        patch: {
+          tags: ["Cards"],
+          summary: "Move a card to a different column",
+          parameters: [
+            { name: "columnId", in: "path", required: true, schema: { type: "string" } },
+            { name: "id", in: "path", required: true, schema: { type: "string" } },
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/MoveCardInput" },
+              },
+            },
+          },
+          responses: {
+            200: { description: "Card moved" },
             403: { description: "Forbidden" },
             404: { description: "Card not found" },
           },

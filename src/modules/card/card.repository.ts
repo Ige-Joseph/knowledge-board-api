@@ -2,12 +2,13 @@ import prisma from "../../lib/prisma"
 import { CreateCardInput, UpdateCardInput } from "./card.validator"
 
 const cardRepository = {
-  async create(columnId: string, data: CreateCardInput) {
+  async create(columnId: string, data: CreateCardInput, position: number = 0) {
     return prisma.card.create({
       data: {
         ...data,
         dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
         columnId,
+        position,
       },
     })
   },
@@ -93,6 +94,7 @@ const cardRepository = {
     })
     return result._max.position ?? -1
   },
+  
 }
 
 export default cardRepository
