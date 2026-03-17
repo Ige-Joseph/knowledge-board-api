@@ -32,8 +32,10 @@ const cardRepository = {
     return prisma.card.update({
       where: { id },
       data: {
-        ...data,
+        title: data.title,
+        description: data.description,
         dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
+        version: { increment: 1 },
       },
     })
   },

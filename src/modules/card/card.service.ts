@@ -27,16 +27,23 @@ const cardService = {
     return cardRepository.findByColumn(columnId)
   },
 
-  async updateCard(userId: string, cardId: string, data: UpdateCardInput) {
-    const card = await cardRepository.findById(cardId)
-    if (!card) throw new AppError("Card not found", 404)
+async updateCard(userId: string, cardId: string, data: UpdateCardInput) {
+  const card = await cardRepository.findById(cardId)
+  if (!card) throw new AppError("Card not found", 404)
 
-    const column = await columnRepository.findById(card.columnId)
-    const board = await boardRepository.findById(column!.boardId)
-    if (board?.userId !== userId) throw new AppError("Forbidden", 403)
+  const column = await columnRepository.findById(card.columnId)
+  const board = await boardRepository.findById(column!.boardId)
+  if (board?.userId !== userId) throw new AppError("Forbidden", 403)
 
-    return cardRepository.update(cardId, data)
-  },
+  if (card.version !== data.version) {
+    throw new AppError(
+      "Conflict: card was updated by someone else. Fetch the latest version and try again.",
+      409
+    )
+  }
+
+  return cardRepository.update(cardId, data)
+},
 
   async deleteCard(userId: string, cardId: string) {
     const card = await cardRepository.findById(cardId)
