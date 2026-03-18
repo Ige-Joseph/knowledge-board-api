@@ -1,5 +1,6 @@
 import { Server as SocketIOServer } from "socket.io"
 import { Server as HttpServer } from "http"
+import logger from "./logger"
 
 let io: SocketIOServer
 
@@ -12,20 +13,20 @@ export const initSocket = (httpServer: HttpServer) => {
   })
 
   io.on("connection", (socket) => {
-    console.log(`Client connected: ${socket.id}`)
+    logger.info(`Client connected: ${socket.id}`)
 
     socket.on("join_board", (boardId: string) => {
       socket.join(boardId)
-      console.log(`Client ${socket.id} joined board ${boardId}`)
+      logger.info(`Client ${socket.id} joined board ${boardId}`)
     })
 
     socket.on("leave_board", (boardId: string) => {
       socket.leave(boardId)
-      console.log(`Client ${socket.id} left board ${boardId}`)
+      logger.info(`Client ${socket.id} left board ${boardId}`)
     })
 
     socket.on("disconnect", () => {
-      console.log(`Client disconnected: ${socket.id}`)
+      logger.info(`Client disconnected: ${socket.id}`)
     })
   })
 

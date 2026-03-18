@@ -14,6 +14,8 @@ import { swaggerSpec } from "./config/swagger"
 import cors from "cors"
 import commentRoutes from "./modules/comment/comment.routes"
 import { initSocket } from "./lib/socket"
+import requestLogger from "./middlewares/request-logger.middleware"
+
 
 const app = express()
 const httpServer = createServer(app)
@@ -23,6 +25,7 @@ initSocket(httpServer)
 
 app.use(cors())
 app.use(express.json())
+app.use(requestLogger)
 
 // health check
 app.get("/health", async (_req, res) => {
