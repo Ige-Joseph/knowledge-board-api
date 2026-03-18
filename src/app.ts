@@ -1,4 +1,5 @@
 import express from "express"
+import { createServer } from "http"
 import { env } from "./config/env"
 import errorMiddleware from "./middlewares/error.middleware"
 import prisma from "./lib/prisma"
@@ -12,8 +13,14 @@ import swaggerUi from "swagger-ui-express"
 import { swaggerSpec } from "./config/swagger"
 import cors from "cors"
 import commentRoutes from "./modules/comment/comment.routes"
+import { initSocket } from "./lib/socket"
 
 const app = express()
+const httpServer = createServer(app)
+
+// initialize socket.io
+initSocket(httpServer)
+
 app.use(cors())
 app.use(express.json())
 
@@ -38,7 +45,7 @@ app.use("/api/cards/:cardId/comments", commentRoutes)
 
 app.use(errorMiddleware)
 
-app.listen(env.port, () => {
+httpServer.listen(env.port, () => {
   console.log(`Server running on port ${env.port}`)
 })
 

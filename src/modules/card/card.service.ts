@@ -4,6 +4,7 @@ import boardRepository from "../board/board.repository"
 import cardRepository from "./card.repository"
 import { CreateCardInput, UpdateCardInput, AssignTagsInput } from "./card.validator"
 import prisma from "../../lib/prisma"
+import { getIO } from "../../lib/socket"
 
 const cardService = {
   async createCard(userId: string, columnId: string, data: CreateCardInput) {
@@ -14,7 +15,12 @@ const cardService = {
     if (board?.userId !== userId) throw new AppError("Forbidden", 403)
 
     const maxPosition = await cardRepository.getMaxPosition(columnId)
-    return cardRepository.create(columnId, data, maxPosition + 1)
+    const card = await cardRepository.create(columnId, data, maxPosition + 1)
+
+    // emit real-time event
+    getIO().to(column.boardId).emit("card_created", { card, columnId, boardId: column.boardId })
+
+    return card
   },
 
   async getCardsByColumn(userId: string, columnId: string, page: number = 1, limit: number = 10) {
@@ -105,18 +111,14 @@ async updateCard(userId: string, cardId: string, data: UpdateCardInput) {
     const targetColumn = await columnRepository.findById(targetColumnId)
     if (!targetColumn) throw new AppError("Target column not found", 404)
 
-    // verify target column belongs to same board
     if (targetColumn.boardId !== board!.id) throw new AppError("Cannot move card to a different board", 400)
 
     await prisma.$transaction(async () => {
-      // shift cards up in source column to fill the gap
       await cardRepository.shiftPositionsUp(card.columnId, card.position + 1, 9999)
 
-      // determine position in target column
       const maxPosition = await cardRepository.getMaxPosition(targetColumnId)
       const targetPosition = newPosition !== undefined ? newPosition : maxPosition + 1
 
-      // shift cards down in target column to make room
       if (newPosition !== undefined) {
         await cardRepository.shiftPositionsDown(targetColumnId, newPosition, 9999)
       }
@@ -124,7 +126,17 @@ async updateCard(userId: string, cardId: string, data: UpdateCardInput) {
       await cardRepository.moveToColumn(cardId, targetColumnId, targetPosition)
     })
 
-    return cardRepository.findById(cardId)
+    const updatedCard = await cardRepository.findById(cardId)
+
+    // emit real-time event
+    getIO().to(board!.id).emit("card_moved", {
+      card: updatedCard,
+      fromColumnId: card.columnId,
+      toColumnId: targetColumnId,
+      boardId: board!.id,
+    })
+
+    return updatedCard
   },
 }
 

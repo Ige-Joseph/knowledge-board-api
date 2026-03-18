@@ -1,4 +1,5 @@
 import AppError from "../../utils/AppError"
+import { getIO } from "../../lib/socket"
 import cardRepository from "../card/card.repository"
 import columnRepository from "../column/column.repository"
 import boardRepository from "../board/board.repository"
@@ -14,7 +15,12 @@ const commentService = {
     const board = await boardRepository.findById(column!.boardId)
     if (board?.userId !== userId) throw new AppError("Forbidden", 403)
 
-    return commentRepository.create(cardId, userId, data)
+    const comment = await commentRepository.create(cardId, userId, data)
+
+    // emit real-time event
+    getIO().to(board!.id).emit("comment_added", { comment, cardId, boardId: board!.id })
+
+    return comment
   },
 
   async getCommentsByCard(userId: string, cardId: string) {
