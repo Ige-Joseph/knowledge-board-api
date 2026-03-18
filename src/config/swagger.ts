@@ -170,6 +170,10 @@ const options: swaggerJsdoc.Options = {
         get: {
           tags: ["Boards"],
           summary: "Get all boards for logged in user",
+          parameters: [
+            { name: "page", in: "query", required: false, schema: { type: "integer", default: 1 } },
+            { name: "limit", in: "query", required: false, schema: { type: "integer", default: 10 } },
+          ],
           responses: {
             200: { description: "List of boards" },
             401: { description: "Unauthorized" },
@@ -294,6 +298,8 @@ const options: swaggerJsdoc.Options = {
           summary: "Get all cards in a column",
           parameters: [
             { name: "columnId", in: "path", required: true, schema: { type: "string" } },
+            { name: "page", in: "query", required: false, schema: { type: "integer", default: 1 } },
+            { name: "limit", in: "query", required: false, schema: { type: "integer", default: 10 } },
           ],
           responses: {
             200: { description: "List of cards" },

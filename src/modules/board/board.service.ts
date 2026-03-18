@@ -7,8 +7,8 @@ const boardService = {
     return boardRepository.create(userId, data)
   },
 
-  async getUserBoards(userId: string) {
-    return boardRepository.findAllByUser(userId)
+  async getUserBoards(userId: string, page: number = 1, limit: number = 10) {
+    return boardRepository.findAllByUser(userId, page, limit)
   },
 
   async updateBoard(userId: string, boardId: string, data: UpdateBoardInput) {

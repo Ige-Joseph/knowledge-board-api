@@ -15,7 +15,14 @@ const cardController = {
 
   async getCardsByColumn(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const cards = await cardService.getCardsByColumn(req.user!.id, req.params.columnId as string)
+      const page = parseInt(req.query.page as string) || 1
+      const limit = parseInt(req.query.limit as string) || 10
+      const cards = await cardService.getCardsByColumn(
+        req.user!.id,
+        req.params.columnId as string,
+        page,
+        limit
+      )
       sendSuccess(res, cards)
     } catch (err) {
       next(err)
@@ -76,7 +83,7 @@ const cardController = {
       next(err)
     }
   },
-  
+
 }
 
 export default cardController

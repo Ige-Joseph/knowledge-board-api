@@ -20,12 +20,19 @@ const cardRepository = {
     })
   },
 
-  async findByColumn(columnId: string) {
-    return prisma.card.findMany({
-      where: { columnId },
-      include: { tags: { include: { tag: true } } },
-      orderBy: { position: "asc" },
-    })
+  async findByColumn(columnId: string, page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit
+    const [cards, total] = await Promise.all([
+      prisma.card.findMany({
+        where: { columnId },
+        include: { tags: { include: { tag: true } } },
+        orderBy: { position: "asc" },
+        skip,
+        take: limit,
+      }),
+      prisma.card.count({ where: { columnId } }),
+    ])
+    return { cards, total, page, limit, totalPages: Math.ceil(total / limit) }
   },
 
   async update(id: string, data: UpdateCardInput) {

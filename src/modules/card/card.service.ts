@@ -17,14 +17,14 @@ const cardService = {
     return cardRepository.create(columnId, data, maxPosition + 1)
   },
 
-  async getCardsByColumn(userId: string, columnId: string) {
+  async getCardsByColumn(userId: string, columnId: string, page: number = 1, limit: number = 10) {
     const column = await columnRepository.findById(columnId)
     if (!column) throw new AppError("Column not found", 404)
 
     const board = await boardRepository.findById(column.boardId)
     if (board?.userId !== userId) throw new AppError("Forbidden", 403)
 
-    return cardRepository.findByColumn(columnId)
+    return cardRepository.findByColumn(columnId, page, limit)
   },
 
 async updateCard(userId: string, cardId: string, data: UpdateCardInput) {
